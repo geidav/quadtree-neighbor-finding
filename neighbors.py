@@ -46,24 +46,25 @@ class QuadTree:
     def is_leaf(self):
         return not self.children
                              
-    def get_neighbor_of_greater_or_same_size(self, direction):   
+    def get_neighbor_of_greater_or_equal_size(self, direction):   
         if direction == self.Direction.N:       
             if self.parent is None:
                 return None
-            if self.parent.children[self.Child.SW] == self:
+            if self.parent.children[self.Child.SW] == self: # Is 'self' SW child?
                 return self.parent.children[self.Child.NW]
-            if self.parent.children[self.Child.SE] == self:
+            if self.parent.children[self.Child.SE] == self: # Is 'self' SE child?
                 return self.parent.children[self.Child.NE]
                 
-            node = self.parent.get_neighbor_of_greater_or_same_size(direction)            
+            node = self.parent.get_neighbor_of_greater_or_equal_size(direction)
             if node is None or node.is_leaf():
                 return node
-                
+
+            # 'self' is guaranteed to be a north child
             return (node.children[self.Child.SW]
-                    if self.parent.children[self.Child.NW] == self
+                    if self.parent.children[self.Child.NW] == self # Is 'self' NW child?
                     else node.children[self.Child.SE])
         else:
-            # TODO: implement me (symmetric to NORTH case)
+            # TODO: implement other directions symmetric to NORTH case
             assert False
             return []
 
@@ -80,14 +81,14 @@ class QuadTree:
                     candidates.append(candidates[0].children[self.Child.SE])
                     
                 candidates.remove(candidates[0])
+
+            return neighbors
         else:
-            # TODO: implement me (symmetric to NORTH case)
+            # TODO: implement other directions symmetric to NORTH case
             assert False
             
-        return neighbors
-            
     def get_neighbors(self, direction):   
-        neighbor = self.get_neighbor_of_greater_or_same_size(direction)
+        neighbor = self.get_neighbor_of_greater_or_equal_size(direction)
         neighbors = self.find_neighbors_of_smaller_size(neighbor, direction)
         return neighbors
             
@@ -168,9 +169,3 @@ canvas.create_text(10, 20, text="Neighbors", fill=QuadTree.Colors[QuadTree.Tag.N
 test_simple_cases()
 test_complex_cases()
 mainloop()
-
-
-
-# - Finding neighbors of greater or equal size is relatively easy
-# - Finding neighbors of smaller size is hard, because we have to keep track of how to climb down the tree to find the right neighbors
-# - 
